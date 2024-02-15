@@ -15,7 +15,16 @@ const jwt = require("jsonwebtoken");
 
 const app = express();
 const port = 3000;
-app.use(cors());
+//app.use(cors());
+const corsOptions = {
+  origin: "https://ddsdoe-api.ddc.moph.go.th/", // Replace with your frontend domain
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
+
 // Middleware to parse JSON
 app.use(bodyParser.json());
 
