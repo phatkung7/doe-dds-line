@@ -83,6 +83,7 @@ app.get("/health", (req, res) => {
 });
 
 app.post("/check-user-moph-ic-v1", async (req, res) => {
+  //req.setHeader("Access-Control-Allow-Origin", "*");
   const { hospcode, password, username, idTokenLine } = req.body;
   if (!username) {
     return res.status(404).json({ error: "username is required" });
