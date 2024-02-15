@@ -41,7 +41,7 @@ const User = sequelize.define(
 );
 
 //This will create the "users" table in your database
-// User.sync({ force: false }).then(() => {
-//   console.log("User table synced");
-// });
+User.sync({ force: false }).then(() => {
+  console.log("User table synced");
+});
 module.exports = User;
