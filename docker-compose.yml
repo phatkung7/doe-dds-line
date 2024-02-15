@@ -1,17 +1,12 @@
 version: '3'
 services:
   nodejs-app:
-    image: node:14
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: nodejs-app
-    working_dir: /app
-    volumes:
-      - ./app:/app
-    environment:
-      NODE_ENV: production
-    command: npm start
     expose:
       - 3000
-
   nginx-proxy:
     image: nginx:latest
     container_name: nginx-proxy
