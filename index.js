@@ -38,7 +38,7 @@ const LineVerifyIDToken = async (idToken) => {
     return response.data;
   } catch (error) {
     console.error("Error verifying Line ID token:", error);
-    throw error;
+    //throw error;
   }
 };
 
