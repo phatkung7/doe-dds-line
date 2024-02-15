@@ -14,7 +14,7 @@ const jwt = require("jsonwebtoken");
 //const lineNotify = require("line-notify-nodejs")(process.env.LINE_NOTIFY);
 
 const app = express();
-const port = 3333;
+const port = 3000;
 app.use(cors());
 // Middleware to parse JSON
 app.use(bodyParser.json());
