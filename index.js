@@ -3,7 +3,8 @@ const axios = require("axios");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const sequelize = require("sequelize");
-const Usersso = require("./models/usersso");
+//const Usersso = require("./models/usersso");
+const User = require("./models/user");
 const { sendEmail } = require("./emailSender");
 const e = require("express");
 const crypto = require("crypto");
@@ -82,15 +83,48 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK" });
 });
 
-app.post("/check-user-moph-ic-v1", async (req, res) => {
-  //req.setHeader("Access-Control-Allow-Origin", "*");
+// app.post("/check-user-moph-ic-v1", async (req, res) => {
+//   //req.setHeader("Access-Control-Allow-Origin", "*");
+//   const { hospcode, password, username, idTokenLine } = req.body;
+//   if (!username) {
+//     return res.status(404).json({ error: "username is required" });
+//   }
+//   //check user on PDSA
+//   const user_pdsa = await Usersso.findByUserPDSA(username);
+//   if (user_pdsa) {
+//     // Create HMAC-SHA256 hash
+//     const hmac = crypto.createHmac("sha256", process.env.MOPHIC_SECRETKEY);
+//     hmac.update(password);
+//     const hash = hmac.digest("hex");
+//     const password_encrypt = hash.toUpperCase();
+//     // Option 1: Append parameters to the URL
+//     const urlWithParameters = `${process.env.MOPHIC_ENDPOINT_AUTH}&user=${username}&password_hash=${password_encrypt}&hospital_code=${hospcode}`;
+//     axios
+//       .post(urlWithParameters)
+//       .then((response) => {
+//         // Decode the JWT payload
+//         const decodedPayload = jwt.decode(response.data, { complete: true });
+//         res.status(200).json({ data: decodedPayload });
+//       })
+//       .catch((error) => {
+//         console.error(error);
+//       });
+//   } else {
+//     res.status(400).json({ error: `user : ${username} not found` });
+//   }
+// });
+app.post("/check-user-moph-ic-v2", async (req, res) => {
   const { hospcode, password, username, idTokenLine } = req.body;
-  if (!username) {
-    return res.status(404).json({ error: "username is required" });
+  if (!username || !hospcode || !password || !idTokenLine) {
+    return res
+      .status(404)
+      .json({ error: "username,hospcode,idTokenLine is required" });
   }
-  //check user on PDSA
-  const user_pdsa = await Usersso.findByUserPDSA(username);
-  if (user_pdsa) {
+  //Line Decode Token
+  const profile_decode = await LineVerifyIDToken(idTokenLine);
+  // Get Profile
+  const userId = profile_decode?.sub;
+  if (userId) {
     // Create HMAC-SHA256 hash
     const hmac = crypto.createHmac("sha256", process.env.MOPHIC_SECRETKEY);
     hmac.update(password);
@@ -103,59 +137,31 @@ app.post("/check-user-moph-ic-v1", async (req, res) => {
       .then((response) => {
         // Decode the JWT payload
         const decodedPayload = jwt.decode(response.data, { complete: true });
-        res.status(200).json({ data: decodedPayload });
+        const moph_hospcode = decodedPayload.payload.client.hospital_code;
+        const moph_username = decodedPayload.payload.client.login;
+
+        if (moph_hospcode || moph_username || userId) {
+          User.create({
+            hospcode: moph_hospcode,
+            username: moph_username,
+            user_id_line: userId,
+            created_at: new Date(),
+            status: "active",
+          });
+          //Set Rich Menu By userId
+          linkRichMenu(userId, process.env.RICHMENU_SERVICE);
+        }
+        //res.status(200).json({ data: decodedPayload.payload, status: "success" });
+        res.status(200).json({ status: "success" });
       })
       .catch((error) => {
-        console.error(error);
+        //console.error(error);
+        res.status(500).json({ error: "ไม่พบผู้ใช้งาน MOPHIC" });
       });
   } else {
-    res.status(400).json({ error: `user : ${username} not found` });
+    console.error("The 'sub' property is missing in the decoded profile.");
+    // Handle the error or take appropriate action
   }
-});
-app.post("/check-user-moph-ic-v2", async (req, res) => {
-  const { hospcode, password, username, idTokenLine } = req.body;
-  if (!username || !hospcode || !password || !idTokenLine) {
-    return res
-      .status(404)
-      .json({ error: "username,hospcode,idTokenLine is required" });
-  }
-  //Line Decode Token
-  const profile_decode = await LineVerifyIDToken(idTokenLine);
-  // Get Profile
-  const userId = profile_decode.sub;
-  // Create HMAC-SHA256 hash
-  const hmac = crypto.createHmac("sha256", process.env.MOPHIC_SECRETKEY);
-  hmac.update(password);
-  const hash = hmac.digest("hex");
-  const password_encrypt = hash.toUpperCase();
-  // Option 1: Append parameters to the URL
-  const urlWithParameters = `${process.env.MOPHIC_ENDPOINT_AUTH}&user=${username}&password_hash=${password_encrypt}&hospital_code=${hospcode}`;
-  axios
-    .post(urlWithParameters)
-    .then((response) => {
-      // Decode the JWT payload
-      const decodedPayload = jwt.decode(response.data, { complete: true });
-      const moph_hospcode = decodedPayload.payload.client.hospital_code;
-      const moph_username = decodedPayload.payload.client.login;
-
-      if (moph_hospcode || moph_username || userId) {
-        Usersso.create({
-          hospcode: moph_hospcode,
-          username: moph_username,
-          user_id_line: userId,
-          created_at: new Date(),
-          status: "active",
-        });
-        //Set Rich Menu By userId
-        linkRichMenu(userId, process.env.RICHMENU_SERVICE);
-      }
-      //res.status(200).json({ data: decodedPayload.payload, status: "success" });
-      res.status(200).json({ status: "success" });
-    })
-    .catch((error) => {
-      //console.error(error);
-      res.status(500).json({ error: "ไม่พบผู้ใช้งาน MOPHIC" });
-    });
 });
 
 app.listen(port, () => {

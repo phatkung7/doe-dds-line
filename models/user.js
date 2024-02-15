@@ -35,7 +35,7 @@ const User = sequelize.define(
     },
   },
   {
-    tableName: "users_sso", // You can customize the table name if needed
+    tableName: "users", // You can customize the table name if needed
     timestamps: true, // Set to true if you want createdAt and updatedAt fields
   }
 );
