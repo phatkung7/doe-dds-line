@@ -17,14 +17,17 @@ const jwt = require("jsonwebtoken");
 const app = express();
 const port = 3000;
 //app.use(cors());
-app.use(
-  cors({
-    origin: "https://ddsdoe-alert.ddc.moph.go.th/",
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true,
-    optionsSuccessStatus: 204, // For preflight requests
-  })
-);
+
+app.use((req, res, next) => {
+  const allowedOrigins = ["*"]; // Add your allowed origins
+  const origin = req.headers.origin;
+
+  if (allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
+  // ... other CORS headers and configurations
+  next();
+});
 
 // Middleware to parse JSON
 app.use(bodyParser.json());
