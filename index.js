@@ -17,8 +17,6 @@ const jwt = require("jsonwebtoken");
 const app = express();
 const port = 3000;
 app.use(cors());
-// Handle OPTIONS requests
-app.options("*", cors());
 // Middleware to parse JSON
 app.use(bodyParser.json());
 
