@@ -125,6 +125,7 @@ app.post("/check-user-moph-ic-v2", async (req, res) => {
   // Get Profile
   const userId = profile_decode?.sub;
   if (userId) {
+    console.log(`UserId : ${userId}`);
     // Create HMAC-SHA256 hash
     const hmac = crypto.createHmac("sha256", process.env.MOPHIC_SECRETKEY);
     hmac.update(password);
@@ -135,6 +136,7 @@ app.post("/check-user-moph-ic-v2", async (req, res) => {
     axios
       .post(urlWithParameters)
       .then((response) => {
+        console.log(`GET Decode the JWT payload`);
         // Decode the JWT payload
         const decodedPayload = jwt.decode(response.data, { complete: true });
         const moph_hospcode = decodedPayload.payload.client.hospital_code;
@@ -155,7 +157,7 @@ app.post("/check-user-moph-ic-v2", async (req, res) => {
         res.status(200).json({ status: "success" });
       })
       .catch((error) => {
-        //console.error(error);
+        console.error(error);
         res.status(500).json({ error: "ไม่พบผู้ใช้งาน MOPHIC" });
       });
   } else {
