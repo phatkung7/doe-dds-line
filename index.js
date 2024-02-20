@@ -24,7 +24,7 @@ app.use(bodyParser.json());
 const LineVerifyIDToken = async (idToken) => {
   const params = new URLSearchParams();
   params.append("id_token", idToken);
-  params.append("client_id", process.env.LIFF_CHANNEL_ID);
+  params.append("client_id", process.env.LINE_CHANNEL_ID);
   const headers = {
     "Content-Type": "application/x-www-form-urlencoded",
   };
@@ -44,11 +44,11 @@ const LineVerifyIDToken = async (idToken) => {
   }
 };
 
-const issueTokenV3 = async (idToken) => {
+const issueTokenV3 = async () => {
   let data = qs.stringify({
     grant_type: "client_credentials",
-    client_id: LINE_CHANNEL_ID_MSG,
-    client_secret: LINE_CHANNEL_SECRET,
+    client_id: process.env.LINE_CHANNEL_ID,
+    client_secret: process.env.LINE_CHANNEL_SECRET,
   });
   let response = await axios({
     method: "post",
@@ -123,9 +123,10 @@ app.post("/check-user-moph-ic-v2", async (req, res) => {
   }
   console.log(`idTokenLine : ${idTokenLine}`);
   //Line Decode Token
-  //const profile_decode = await LineVerifyIDToken(idTokenLine);
+  const profile_decode = await LineVerifyIDToken(idTokenLine);
   // Get Profile
-  // const userId = profile_decode?.sub;
+  const userId = profile_decode?.sub;
+  console.log(`UserId : ${userId}`);
   // if (userId) {
   //   console.log(`UserId : ${userId}`);
   //   // Create HMAC-SHA256 hash
