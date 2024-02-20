@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const { sendEmail } = require("./emailSender");
 const { User } = require("./models/user"); // Assuming the model is correctly exported from "./models"
 const sequelize = require("sequelize");
+const qs = require("qs");
 
 const app = express();
 const port = 3000;
