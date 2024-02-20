@@ -31,7 +31,7 @@ const LineVerifyIDToken = async (idToken) => {
   // params.append("id_token", idToken);
   // params.append("client_id", process.env.LIFF_CHANNEL_ID);
   let data = qs.stringify({
-    id_token: token,
+    id_token: idToken,
     client_id: process.env.LIFF_CHANNEL_ID,
   });
 
