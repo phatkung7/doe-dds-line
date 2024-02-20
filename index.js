@@ -139,7 +139,11 @@ app.post("/check-user-moph-ic-v2", async (req, res) => {
     }
   } catch (error) {
     console.error("Error in check-user-moph-ic-v2:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res
+      .status(500)
+      .json({
+        error: "Internal server error For Get LineVerifyIDToken Or MOPH AUTH",
+      });
   }
 });
 
