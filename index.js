@@ -129,50 +129,51 @@ app.post("/check-user-moph-ic-v2", async (req, res) => {
       .status(404)
       .json({ error: "username,hospcode,idTokenLine is required" });
   }
+  res.status(200).json({ status: "success" });
   //Line Decode Token
-  const profile_decode = await LineVerifyIDToken(idTokenLine);
+  //const profile_decode = await LineVerifyIDToken(idTokenLine);
   // Get Profile
-  const userId = profile_decode?.sub;
-  if (userId) {
-    console.log(`UserId : ${userId}`);
-    // Create HMAC-SHA256 hash
-    const hmac = crypto.createHmac("sha256", process.env.MOPHIC_SECRETKEY);
-    hmac.update(password);
-    const hash = hmac.digest("hex");
-    const password_encrypt = hash.toUpperCase();
-    // Option 1: Append parameters to the URL
-    const urlWithParameters = `${process.env.MOPHIC_ENDPOINT_AUTH}&user=${username}&password_hash=${password_encrypt}&hospital_code=${hospcode}`;
-    axios
-      .post(urlWithParameters)
-      .then((response) => {
-        console.log(`GET Decode the JWT payload`);
-        // Decode the JWT payload
-        const decodedPayload = jwt.decode(response.data, { complete: true });
-        const moph_hospcode = decodedPayload.payload.client.hospital_code;
-        const moph_username = decodedPayload.payload.client.login;
+  // const userId = profile_decode?.sub;
+  // if (userId) {
+  //   console.log(`UserId : ${userId}`);
+  //   // Create HMAC-SHA256 hash
+  //   const hmac = crypto.createHmac("sha256", process.env.MOPHIC_SECRETKEY);
+  //   hmac.update(password);
+  //   const hash = hmac.digest("hex");
+  //   const password_encrypt = hash.toUpperCase();
+  //   // Option 1: Append parameters to the URL
+  //   const urlWithParameters = `${process.env.MOPHIC_ENDPOINT_AUTH}&user=${username}&password_hash=${password_encrypt}&hospital_code=${hospcode}`;
+  //   axios
+  //     .post(urlWithParameters)
+  //     .then((response) => {
+  //       console.log(`GET Decode the JWT payload`);
+  //       // Decode the JWT payload
+  //       const decodedPayload = jwt.decode(response.data, { complete: true });
+  //       const moph_hospcode = decodedPayload.payload.client.hospital_code;
+  //       const moph_username = decodedPayload.payload.client.login;
 
-        if (moph_hospcode || moph_username || userId) {
-          User.create({
-            hospcode: moph_hospcode,
-            username: moph_username,
-            user_id_line: userId,
-            created_at: new Date(),
-            status: "active",
-          });
-          //Set Rich Menu By userId
-          linkRichMenu(userId, process.env.RICHMENU_SERVICE);
-        }
-        //res.status(200).json({ data: decodedPayload.payload, status: "success" });
-        res.status(200).json({ status: "success" });
-      })
-      .catch((error) => {
-        console.error(error);
-        res.status(500).json({ error: "ไม่พบผู้ใช้งาน MOPHIC" });
-      });
-  } else {
-    console.error("The 'sub' property is missing in the decoded profile.");
-    // Handle the error or take appropriate action
-  }
+  //       if (moph_hospcode || moph_username || userId) {
+  //         User.create({
+  //           hospcode: moph_hospcode,
+  //           username: moph_username,
+  //           user_id_line: userId,
+  //           created_at: new Date(),
+  //           status: "active",
+  //         });
+  //         //Set Rich Menu By userId
+  //         linkRichMenu(userId, process.env.RICHMENU_SERVICE);
+  //       }
+  //       //res.status(200).json({ data: decodedPayload.payload, status: "success" });
+  //       res.status(200).json({ status: "success" });
+  //     })
+  //     .catch((error) => {
+  //       console.error(error);
+  //       res.status(500).json({ error: "ไม่พบผู้ใช้งาน MOPHIC" });
+  //     });
+  // } else {
+  //   console.error("The 'sub' property is missing in the decoded profile.");
+  //   // Handle the error or take appropriate action
+  // }
 });
 
 app.listen(port, () => {
