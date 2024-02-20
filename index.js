@@ -121,8 +121,9 @@ app.post("/check-user-moph-ic-v2", async (req, res) => {
       .status(404)
       .json({ error: "username,hospcode,idTokenLine is required" });
   }
+  console.log(`idTokenLine : ${idTokenLine}`);
   //Line Decode Token
-  const profile_decode = await LineVerifyIDToken(idTokenLine);
+  //const profile_decode = await LineVerifyIDToken(idTokenLine);
   // Get Profile
   const userId = profile_decode?.sub;
   if (userId) {
@@ -163,6 +164,7 @@ app.post("/check-user-moph-ic-v2", async (req, res) => {
       });
   } else {
     console.error("The 'sub' property is missing in the decoded profile.");
+    res.status(500).json({ status: "Can't Get userId" });
     // Handle the error or take appropriate action
   }
 });
