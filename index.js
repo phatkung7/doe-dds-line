@@ -13,7 +13,15 @@ const app = express();
 const port = 3000;
 
 // CORS middleware
-app.use(cors());
+//app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+    optionsSuccessStatus: 204,
+  })
+);
 
 // Middleware to parse JSON
 app.use(bodyParser.json());
