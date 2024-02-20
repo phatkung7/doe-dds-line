@@ -18,17 +18,20 @@ app.use(cors());
 app.use(bodyParser.json());
 
 const LineVerifyIDToken = async (idToken) => {
-  const params = new URLSearchParams();
-  params.append("id_token", idToken);
-  params.append("client_id", process.env.LIFF_CHANNEL_ID);
+  // const params = new URLSearchParams();
+  // params.append("id_token", idToken);
+  // params.append("client_id", process.env.LIFF_CHANNEL_ID);
+  let data = qs.stringify({
+    id_token: token,
+    client_id: process.env.LIFF_CHANNEL_ID,
+  });
 
   try {
     const response = await axios.post(
       "https://api.line.me/oauth2/v2.1/verify",
-      params,
+      data,
       { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
     );
-
     // Assuming the response contains the decoded data
     return response.data;
   } catch (error) {
@@ -139,11 +142,9 @@ app.post("/check-user-moph-ic-v2", async (req, res) => {
     }
   } catch (error) {
     console.error("Error in check-user-moph-ic-v2:", error);
-    res
-      .status(500)
-      .json({
-        error: "Internal server error For Get LineVerifyIDToken Or MOPH AUTH",
-      });
+    res.status(500).json({
+      error: "Internal server error For Get LineVerifyIDToken Or MOPH AUTH",
+    });
   }
 });
 
