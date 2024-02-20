@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { sendEmail } = require("./emailSender");
-const { User } = require("./models"); // Assuming the model is correctly exported from "./models"
+const { User } = require("./models/user"); // Assuming the model is correctly exported from "./models"
 const sequelize = require("sequelize");
 
 const app = express();
