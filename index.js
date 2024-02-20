@@ -121,13 +121,13 @@ app.post("/check-user-moph-ic-v2", async (req, res) => {
       .status(404)
       .json({ error: "username,hospcode,idTokenLine is required" });
   }
-  console.log(`idTokenLine : ${idTokenLine}`);
+  //console.log(`idTokenLine : ${idTokenLine}`);
   //Line Decode Token
   const profile_decode = await LineVerifyIDToken(idTokenLine);
   // Get Profile
   const userId = profile_decode?.sub;
   if (userId) {
-    console.log(`UserId : ${userId}`);
+    //console.log(`UserId : ${userId}`);
     // Create HMAC-SHA256 hash
     const hmac = crypto.createHmac("sha256", process.env.MOPHIC_SECRETKEY);
     hmac.update(password);
