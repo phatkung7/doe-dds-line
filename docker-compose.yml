@@ -16,7 +16,7 @@ services:
     depends_on:
       - mysql
     networks:
-      - default
+      - nginx-proxy
 
   nginx-proxy:
     image: nginx:latest
@@ -30,7 +30,7 @@ services:
     depends_on:
       - nodejs-app
     networks:
-      - default
+      - nginx-proxy
 
   mysql:
     image: mysql:latest
@@ -45,14 +45,13 @@ services:
       - ./mysql/my.cnf:/etc/mysql/my.cnf
       - ./mysql-files:/var/lib/mysql-files
     networks:
-      - default
+      - nginx-proxy
 
 volumes:
   dbdata:
     driver: local
 
 networks:
-  default:
+  nginx-proxy:
     external:
       name: nginx-proxy
-      external: true
