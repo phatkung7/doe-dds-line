@@ -9,6 +9,7 @@ const { sendEmail } = require("./emailSender");
 const e = require("express");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
+var qs = require('qs');
 //Line API
 //const MessagingApiClient = require("@line/bot-sdk").messagingApi.MessagingApiClient;
 //Line Notify
