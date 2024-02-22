@@ -25,7 +25,7 @@ app.use(bodyParser.json());
 const LineVerifyIDToken = async (idToken) => {
   const params = new URLSearchParams();
   params.append("id_token", idToken);
-  params.append("client_id", process.env.LINE_CHANNEL_ID);
+  params.append("client_id", process.env.LIFF_CHANNEL_ID);
   const headers = {
     "Content-Type": "application/x-www-form-urlencoded",
   };
