@@ -69,7 +69,7 @@ const linkRichMenu = async (userId, richMenuId) => {
 
   return axios({
     method: "post",
-    url: `${LINE_MESSAGING_API}/user/${userId}/richmenu/${richMenuId}`,
+    url: `${process.env.LINE_MESSAGING_API}/user/${userId}/richmenu/${richMenuId}`,
     headers: {
       Authorization: `Bearer ${access_token}`,
       "Content-Type": "application/json",
