@@ -9,7 +9,9 @@ const { sendEmail } = require("./emailSender");
 const e = require("express");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
-var qs = require('qs');
+var qs = require("qs");
+//Line API
+const line = require("./util/line.util");
 //Line API
 //const MessagingApiClient = require("@line/bot-sdk").messagingApi.MessagingApiClient;
 //Line Notify
@@ -22,28 +24,29 @@ app.use(cors());
 // Middleware to parse JSON
 app.use(bodyParser.json());
 
-const LineVerifyIDToken = async (idToken) => {
-  const params = new URLSearchParams();
-  params.append("id_token", idToken);
-  params.append("client_id", process.env.LIFF_CHANNEL_ID);
-  const headers = {
-    "Content-Type": "application/x-www-form-urlencoded",
-  };
+// const LineVerifyIDToken = async (idToken) => {
+//   const params = new URLSearchParams();
+//   params.append("id_token", idToken);
+//   params.append("client_id", process.env.LIFF_CHANNEL_ID);
+//   console.log(`========= LIFF_CHANNEL_ID : ${process.env.LIFF_CHANNEL_ID}`);
+//   const headers = {
+//     "Content-Type": "application/x-www-form-urlencoded",
+//   };
 
-  try {
-    const response = await axios.post(
-      "https://api.line.me/oauth2/v2.1/verify",
-      params,
-      { headers }
-    );
+//   try {
+//     const response = await axios.post(
+//       "https://api.line.me/oauth2/v2.1/verify",
+//       params,
+//       { headers }
+//     );
 
-    // Assuming the response contains the decoded data
-    return response.data;
-  } catch (error) {
-    console.error("Error verifying Line ID token:", error);
-    //throw error;
-  }
-};
+//     // Assuming the response contains the decoded data
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error verifying Line ID token:", error);
+//     //throw error;
+//   }
+// };
 
 const issueTokenV3 = async () => {
   let data = qs.stringify({
@@ -85,6 +88,14 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK" });
 });
 
+// app.get("/chk", async (req, res) => {
+//   const idTokenLine =
+//     "eyJraWQiOiIyNmNmMzk1ZjQ4MTYyZTRhMzc3MzM5Yjk1MjBjNzA2NzI5ZTFmZGMzYTY0NWI3YTlhZTc3YWMyYTQ4NzVhODA4IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL2FjY2Vzcy5saW5lLm1lIiwic3ViIjoiVTUxMjUwYjliMGM2NDA1ZTJiZTMxMDk1NGQ5NmM5ODg3IiwiYXVkIjoiMjAwMzU1NDkyMyIsImV4cCI6MTcxMDMxNTY5MiwiaWF0IjoxNzEwMzEyMDkyLCJhbXIiOlsibGluZXFyIl0sIm5hbWUiOiJQb29QZWF3IiwicGljdHVyZSI6Imh0dHBzOi8vcHJvZmlsZS5saW5lLXNjZG4ubmV0LzBoRkdjTWpraFRHV2hlTkF6RTVHeG1QMkp4RndVcEdoOGdKZ0JWV1NnMkYxeHpWMTA3WmdWWFhIazNSVjBrVUFvX01sVldDU3RtVGdwMiJ9.oKGYQl5v1Ph0Sv2p3aebw1SMZxAIpdNk-v-kKIwovLSOGkSxJg-GIDHK4HFSs1A-T_EUeeoyZO1eIK5WIIMHsg";
+//   const profile_decode = await LineVerifyIDToken(idTokenLine);
+//   const tokenVerify = await line.verifyIDToken(token);
+//   console.log(`profile_decode : ${profile_decode.sub}`);
+// });
+
 // app.post("/check-user-moph-ic-v1", async (req, res) => {
 //   //req.setHeader("Access-Control-Allow-Origin", "*");
 //   const { hospcode, password, username, idTokenLine } = req.body;
@@ -122,13 +133,14 @@ app.post("/check-user-moph-ic-v2", async (req, res) => {
       .status(404)
       .json({ error: "username,hospcode,idTokenLine is required" });
   }
-  //console.log(`idTokenLine : ${idTokenLine}`);
+  console.log(`idTokenLine : ${idTokenLine}`);
   //Line Decode Token
-  const profile_decode = await LineVerifyIDToken(idTokenLine);
+  //const profile_decode = await LineVerifyIDToken(idTokenLine);
+  const profile_decode = await line.verifyIDToken(idTokenLine);
   // Get Profile
   const userId = profile_decode?.sub;
   if (userId) {
-    //console.log(`UserId : ${userId}`);
+    console.log(`UserId : ${userId}`);
     // Create HMAC-SHA256 hash
     const hmac = crypto.createHmac("sha256", process.env.MOPHIC_SECRETKEY);
     hmac.update(password);
@@ -153,7 +165,7 @@ app.post("/check-user-moph-ic-v2", async (req, res) => {
             status: "active",
           });
           //Set Rich Menu By userId
-          linkRichMenu(userId, process.env.RICHMENU_SERVICE);
+          line.linkRichMenu(userId, process.env.RICHMENU_SERVICE);
         }
         //res.status(200).json({ data: decodedPayload.payload, status: "success" });
         res.status(200).json({ status: "success" });
