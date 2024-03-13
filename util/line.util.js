@@ -419,6 +419,7 @@ exports.verifyIDToken = async (token) => {
     id_token: token,
     client_id: LIFF_CHANNEL_ID,
   });
+  console.log(`LIFF_CHANNEL_ID : ${LIFF_CHANNEL_ID}`);
   let response = await axios({
     method: "post",
     headers: {
