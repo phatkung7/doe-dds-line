@@ -12,12 +12,12 @@ const User = sequelize.define(
     },
     user_id_line: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
       unique: true,
       comment: "userId ของไลน์ในแต่ละ Provider",
     },
     hospcode: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(5),
       allowNull: false,
       comment: "รหัสสถานพยาบาล",
     },
@@ -26,6 +26,17 @@ const User = sequelize.define(
       allowNull: false,
       unique: true,
       comment: "ชื่อใช้ login moph-id",
+    },
+    line_type: {
+      type: DataTypes.STRING(1),
+      allowNull: false,
+      comment: "ประเภทของ Line(ส่วนตัว,ส่วนกลาง)",
+    },
+    line_description: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      defaultValue: null,
+      comment: "ชื่อกลุ่มงาน/หน่วยงาน",
     },
     status: {
       type: DataTypes.ENUM("active", "inactive"),
