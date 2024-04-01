@@ -5,15 +5,14 @@ const bodyParser = require("body-parser");
 const sequelize = require("sequelize");
 //const Usersso = require("./models/usersso");
 const User = require("./models/user");
+const Events = require("./models/event");
 const { sendEmail } = require("./emailSender");
 const e = require("express");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
-var qs = require("qs");
+//var qs = require("qs");
 //Line API
 const line = require("./util/line.util");
-//Line API
-//const MessagingApiClient = require("@line/bot-sdk").messagingApi.MessagingApiClient;
 //Line Notify
 //const lineNotify = require("line-notify-nodejs")(process.env.LINE_NOTIFY);
 
@@ -24,62 +23,6 @@ app.use(cors());
 // Middleware to parse JSON
 app.use(bodyParser.json());
 
-// const LineVerifyIDToken = async (idToken) => {
-//   const params = new URLSearchParams();
-//   params.append("id_token", idToken);
-//   params.append("client_id", process.env.LIFF_CHANNEL_ID);
-//   console.log(`========= LIFF_CHANNEL_ID : ${process.env.LIFF_CHANNEL_ID}`);
-//   const headers = {
-//     "Content-Type": "application/x-www-form-urlencoded",
-//   };
-
-//   try {
-//     const response = await axios.post(
-//       "https://api.line.me/oauth2/v2.1/verify",
-//       params,
-//       { headers }
-//     );
-
-//     // Assuming the response contains the decoded data
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error verifying Line ID token:", error);
-//     //throw error;
-//   }
-// };
-
-const issueTokenV3 = async () => {
-  let data = qs.stringify({
-    grant_type: "client_credentials",
-    client_id: process.env.LINE_CHANNEL_ID,
-    client_secret: process.env.LINE_CHANNEL_SECRET,
-  });
-  let response = await axios({
-    method: "post",
-    maxBodyLength: Infinity,
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    url: "https://api.line.me/oauth2/v3/token",
-    data: data,
-  });
-  return response.data;
-};
-
-const linkRichMenu = async (userId, richMenuId) => {
-  const issue_token = await issueTokenV3();
-  const access_token = issue_token.access_token;
-
-  return axios({
-    method: "post",
-    url: `${process.env.LINE_MESSAGING_API}/user/${userId}/richmenu/${richMenuId}`,
-    headers: {
-      Authorization: `Bearer ${access_token}`,
-      "Content-Type": "application/json",
-    },
-  });
-};
-
 app.get("/", async (req, res) => {
   res.status(200).json({ data: "Hello I'm API From DDDC Thailand" });
 });
@@ -87,14 +30,6 @@ app.get("/", async (req, res) => {
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK" });
 });
-
-// app.get("/chk", async (req, res) => {
-//   const idTokenLine =
-//     "eyJraWQiOiIyNmNmMzk1ZjQ4MTYyZTRhMzc3MzM5Yjk1MjBjNzA2NzI5ZTFmZGMzYTY0NWI3YTlhZTc3YWMyYTQ4NzVhODA4IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL2FjY2Vzcy5saW5lLm1lIiwic3ViIjoiVTUxMjUwYjliMGM2NDA1ZTJiZTMxMDk1NGQ5NmM5ODg3IiwiYXVkIjoiMjAwMzU1NDkyMyIsImV4cCI6MTcxMDMxNTY5MiwiaWF0IjoxNzEwMzEyMDkyLCJhbXIiOlsibGluZXFyIl0sIm5hbWUiOiJQb29QZWF3IiwicGljdHVyZSI6Imh0dHBzOi8vcHJvZmlsZS5saW5lLXNjZG4ubmV0LzBoRkdjTWpraFRHV2hlTkF6RTVHeG1QMkp4RndVcEdoOGdKZ0JWV1NnMkYxeHpWMTA3WmdWWFhIazNSVjBrVUFvX01sVldDU3RtVGdwMiJ9.oKGYQl5v1Ph0Sv2p3aebw1SMZxAIpdNk-v-kKIwovLSOGkSxJg-GIDHK4HFSs1A-T_EUeeoyZO1eIK5WIIMHsg";
-//   const profile_decode = await LineVerifyIDToken(idTokenLine);
-//   const tokenVerify = await line.verifyIDToken(token);
-//   console.log(`profile_decode : ${profile_decode.sub}`);
-// });
 
 // app.post("/check-user-moph-ic-v1", async (req, res) => {
 //   //req.setHeader("Access-Control-Allow-Origin", "*");
@@ -126,12 +61,48 @@ app.get("/health", (req, res) => {
 //     res.status(400).json({ error: `user : ${username} not found` });
 //   }
 // });
-app.post("/check-user-moph-ic-v2", async (req, res) => {
-  const { hospcode, password, username, idTokenLine } = req.body;
-  if (!username || !hospcode || !password || !idTokenLine) {
+app.get("/events-response", async (req, res) => {
+  const { EventID, NotifyID, idTokenLine, ActionID } = req.body;
+  if (!EventID || !NotifyID || !idTokenLine || !ActionID) {
     return res
       .status(404)
-      .json({ error: "username,hospcode,idTokenLine is required" });
+      .json({ error: "EventID,NotifyID,idTokenLine is required" });
+  } else {
+    console.log(`idTokenLine : ${idTokenLine}`);
+    const profile_decode = await line.verifyIDToken(idTokenLine);
+    // Get userId Profile
+    const userId = profile_decode?.sub;
+    try {
+      const user = await User.findOne({ where: { user_id_line: userId } });
+      if (user) {
+        Events.create({
+          user_id_line: userId,
+          hospcode: user.hospcode,
+          username: user.username,
+          event_id: EventID,
+          notify_id: NotifyID,
+          action_id: ActionID,
+          created_at: new Date(),
+        });
+      } else {
+        console.log("User not found");
+        return res
+          .status(404)
+          .json({ error: "ไม่พบผู้ใช้งานจากการค้นหาด้วย userId" });
+      }
+    } catch (error) {
+      console.error(`Error Find By userId: ${idTokenLine}`, error);
+    }
+  }
+});
+
+app.post("/check-user-moph-ic-v2", async (req, res) => {
+  const { hospcode, password, username, idTokenLine, LineType, LineTypeDesc } =
+    req.body;
+  if (!username || !hospcode || !password || !idTokenLine || !LineType) {
+    return res
+      .status(404)
+      .json({ error: "username,hospcode,idTokenLine,LineType is required" });
   }
   console.log(`idTokenLine : ${idTokenLine}`);
   //Line Decode Token
@@ -161,6 +132,8 @@ app.post("/check-user-moph-ic-v2", async (req, res) => {
             hospcode: moph_hospcode,
             username: moph_username,
             user_id_line: userId,
+            line_type: LineType,
+            line_description: LineTypeDesc,
             created_at: new Date(),
             status: "active",
           });
