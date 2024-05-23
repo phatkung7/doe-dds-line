@@ -61,8 +61,45 @@ app.get("/health", (req, res) => {
 //     res.status(400).json({ error: `user : ${username} not found` });
 //   }
 // });
-app.get("/events-response", async (req, res) => {
+
+// app.get("/events-response", async (req, res) => {
+//   const { EventID, NotifyID, idTokenLine, ActionID } = req.body;
+//   if (!EventID || !NotifyID || !idTokenLine || !ActionID) {
+//     return res
+//       .status(404)
+//       .json({ error: "EventID,NotifyID,idTokenLine is required" });
+//   } else {
+//     console.log(`idTokenLine : ${idTokenLine}`);
+//     const profile_decode = await line.verifyIDToken(idTokenLine);
+//     // Get userId Profile
+//     const userId = profile_decode?.sub;
+//     try {
+//       const user = await User.findOne({ where: { user_id_line: userId } });
+//       if (user) {
+//         Events.create({
+//           user_id_line: userId,
+//           hospcode: user.hospcode,
+//           username: user.username,
+//           event_id: EventID,
+//           notify_id: NotifyID,
+//           action_id: ActionID,
+//           created_at: new Date(),
+//         });
+//       } else {
+//         console.log("User not found");
+//         return res
+//           .status(404)
+//           .json({ error: "ไม่พบผู้ใช้งานจากการค้นหาด้วย userId" });
+//       }
+//     } catch (error) {
+//       console.error(`Error Find By userId: ${idTokenLine}`, error);
+//     }
+//   }
+// });
+
+app.post("/test-events-response", async (req, res) => {
   const { EventID, NotifyID, idTokenLine, ActionID } = req.body;
+  console.log(`EventID : ${EventID} ,NotifyID : ${NotifyID} ,idTokenLine : ${idTokenLine} ,ActionID : ${ActionID}`);
   if (!EventID || !NotifyID || !idTokenLine || !ActionID) {
     return res
       .status(404)
@@ -93,9 +130,10 @@ app.get("/events-response", async (req, res) => {
     } catch (error) {
       console.error(`Error Find By userId: ${idTokenLine}`, error);
     }
+    //res.status(200).json({ data: decodedPayload.payload, status: "success" });
+    res.status(200).json({ status: "success" });
   }
 });
-
 app.post("/check-user-moph-ic-v2", async (req, res) => {
   const { hospcode, password, username, idTokenLine, LineType, LineTypeDesc } =
     req.body;
