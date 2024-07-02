@@ -97,7 +97,7 @@ app.get("/health", (req, res) => {
 //   }
 // });
 
-app.post("/test-events-response", async (req, res) => {
+app.post("/events-response", async (req, res) => {
   const { EventID, NotifyID, idTokenLine, ActionID } = req.body;
   console.log(`EventID : ${EventID} ,NotifyID : ${NotifyID} ,idTokenLine : ${idTokenLine} ,ActionID : ${ActionID}`);
   if (!EventID || !NotifyID || !idTokenLine || !ActionID) {
