@@ -13,10 +13,13 @@ const jwt = require("jsonwebtoken");
 //var qs = require("qs");
 //Line API
 const line = require("./util/line.util");
+// ref position 
+const { RefPosition, RefSection } =  require("./models/doesarabun")
 //Line Notify
 //const lineNotify = require("line-notify-nodejs")(process.env.LINE_NOTIFY);
 
 const app = express();
+// const port = 3333;
 const port = 3000;
 app.use(cors());
 
@@ -190,6 +193,22 @@ app.post("/check-user-moph-ic-v2", async (req, res) => {
     res.status(500).json({ status: "Can't Get userId" });
     // Handle the error or take appropriate action
   }
+});
+
+//doe-sarabun-register
+//ref position
+app.get("/ref-position", async (req, res) => {
+  //res.status(200).json({ status: "OK" });
+  const ref_position = await RefPosition.findAll();
+  res.status(200).json({ status: "OK",data: ref_position });
+  //console.log(ref_position);
+});
+//ref section
+app.get("/ref-section", async (req, res) => {
+  //res.status(200).json({ status: "OK" });
+  const ref_section = await RefSection.findAll();
+  res.status(200).json({ status: "OK",data: ref_section });
+  //console.log(ref_section);
 });
 
 app.listen(port, () => {
