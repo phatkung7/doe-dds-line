@@ -14,13 +14,13 @@ const jwt = require("jsonwebtoken");
 //Line API
 const line = require("./util/line.util");
 // ref position 
-const { RefPosition, RefSection } =  require("./models/doesarabun")
+const {  RefPosition, RefSection, Users, UsersDetail, ModelHasRoles, ModelHasSection  } =  require("./models/doesarabun")
 //Line Notify
 //const lineNotify = require("line-notify-nodejs")(process.env.LINE_NOTIFY);
 
 const app = express();
-// const port = 3333;
-const port = 3000;
+const port = 3333;
+// const port = 3000;
 app.use(cors());
 
 // Middleware to parse JSON
@@ -194,7 +194,7 @@ app.post("/check-user-moph-ic-v2", async (req, res) => {
     // Handle the error or take appropriate action
   }
 });
-
+// DOE-Sarabun Session------------------------------------------------------------------------------------
 //doe-sarabun-register
 //ref position
 app.get("/ref-position", async (req, res) => {
@@ -211,6 +211,110 @@ app.get("/ref-section", async (req, res) => {
   //console.log(ref_section);
 });
 
+// insert data to 201
+app.post("/doe-sarabun-register", async (req, res) => {
+  const {  idTokenLine, email, title_name, first_name, last_name, password, position_id, section_id, tel } = req.body;
+  // แสดงข้อมูลที่ถูกส่งมา (request body)
+  console.log("Request Body:", req.body);
+
+  if ( !idTokenLine ) {
+    return res
+      .status(404)
+      .json({ error: "idTokenLine is required" });
+  } else{    
+      // console.log(`idTokenLine : ${idTokenLine}`);
+      const profile_decode = await line.verifyIDToken(idTokenLine);
+      const userId = profile_decode?.sub;
+      const lineName = profile_decode?.name;
+      try {
+        const user = await Users.findOne({ where: { email: email } });
+        if (user) {
+          console.log("ไปอัพเดทนะพ่อหนุ่ม");
+          try {
+            // ค้นหา user จากตาราง Users โดยใช้ email
+            const user_id = await Users.findOne({ where: { email: email } });
+            // console.log("ได้ id:", user.id);
+            // console.log("ได้ userId:", userId);
+            // console.log("ได้ userId:", lineName);
+            // อัปเดตตาราง users_detail
+            await UsersDetail.update(
+              {
+                line_name: lineName,
+                line_token: userId,
+                updated_at: Date.now()
+              },
+              {
+                where: {
+                  user_id: user_id.id,
+                },
+              }
+            );
+            console.log("อัปเดตข้อมูลสำเร็จ");
+            // ส่งข้อมูลกลับ
+            res.status(200).json({ status: "success" })
+            } catch (error) {
+              console.error("เกิดข้อผิดพลาดในการอัปเดตข้อมูล:", error);
+              return res.status(500).json({ error: "เกิดข้อผิดพลาดในการอัปเดตข้อมูล", message: error.message }); // ส่ง error message กลับไปด้วย
+            }
+        } else {
+          console.log("มาเพิ่มใหม่นะพ่อหนุ่ม");
+          try {
+            // เพิ่มข้อมูลใหม่ลงในตาราง Users
+            const newUser = await Users.create({
+              name:  first_name + " " + last_name, 
+              email: email,
+              password: password, 
+              created_at: Date.now()
+
+            });
+        
+            // เพิ่มข้อมูลใหม่ลงในตาราง UsersDetail
+            await UsersDetail.create({
+              user_id: newUser.id, // ใช้ ID จากผู้ใช้ที่เพิ่งสร้าง
+              title_name: title_name,
+              first_name: first_name,
+              last_name: last_name,
+              position_id: position_id,
+              section_id: section_id,
+              tel: tel,
+              line_name: lineName,
+              line_token: userId,
+              created_at: Date.now(),
+              sub_section_id: "0",
+
+            });
+        
+            // เพิ่มข้อมูลใหม่ลงในตาราง ModelHasSection
+            await ModelHasSection.create({
+              user_id: newUser.id,
+              section_id: section_id,
+              sub_section_id: "0",
+              created_at: Date.now(),
+            });
+            // เพิ่มข้อมูลใหม่ลงในตาราง ModelHasRoles
+            const model_type = `App\\Models\\User`;
+            await ModelHasRoles.create({
+              role_id: "5",
+              model_type: model_type,
+              model_id: newUser.id,      
+            },
+            { raw: true });
+            console.log("อัปเดตข้อมูลสำเร็จ");
+            // ส่งข้อมูลกลับ
+            res.status(200).json({ status: "success" })
+            } catch (error) {
+              console.error("เกิดข้อผิดพลาดในการอัปเดตข้อมูล:", error);
+              return res.status(500).json({ error: "เกิดข้อผิดพลาดในการอัปเดตข้อมูล" }); // เพิ่ม return ใน catch block
+            }
+        }
+      } catch (error) {
+        console.error(`Error Find By userId: ${idTokenLine}`, error);
+      }
+  }
+
+});
+
+// DOE-Sarabun Session------------------------------------------------------------------------------------
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}!`);
 });
