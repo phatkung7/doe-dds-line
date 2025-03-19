@@ -1,7 +1,20 @@
 // user.js
 const { DataTypes } = require("sequelize");
 const sequelize = require("../sequelize");
-
+//ฟังก์ชั่นเรียกโรค
+const refdisease = sequelize.define(
+  "refdisease",
+  {
+    disease_name: {
+      type: DataTypes.STRING,
+    },
+  },
+  {
+    tableName: "ref_disease", // You can customize the table name if needed
+    timestamps: false,
+    //timestamps: true, // Set to true if you want createdAt and updatedAt fields
+  }
+);
 const User = sequelize.define(
   "User",
   {
@@ -38,6 +51,12 @@ const User = sequelize.define(
       defaultValue: null,
       comment: "ชื่อกลุ่มงาน/หน่วยงาน",
     },
+    disease_name: {
+      type: DataTypdes.STRING(255),
+      allowNull: true,
+      defaultValue: null,
+      comment: "โรคที่รับผิดชอบ",
+    },
     status: {
       type: DataTypes.ENUM("active", "inactive"),
       allowNull: false,
@@ -55,4 +74,4 @@ const User = sequelize.define(
 // User.sync({ force: false }).then(() => {
 //   console.log("User table synced");
 // });
-module.exports = User;
+module.exports = User,refdisease;

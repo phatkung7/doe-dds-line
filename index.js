@@ -4,7 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const sequelize = require("sequelize");
 //const Usersso = require("./models/usersso");
-const User = require("./models/user");
+const { User, refdisease } = require("./models/user");
 const Events = require("./models/event");
 const { sendEmail } = require("./emailSender");
 const e = require("express");
@@ -99,7 +99,6 @@ app.get("/health", (req, res) => {
 //     }
 //   }
 // });
-
 app.post("/events-response", async (req, res) => {
   const { EventID, NotifyID, idTokenLine, ActionID } = req.body;
   console.log(`EventID : ${EventID} ,NotifyID : ${NotifyID} ,idTokenLine : ${idTokenLine} ,ActionID : ${ActionID}`);
@@ -137,8 +136,14 @@ app.post("/events-response", async (req, res) => {
     res.status(200).json({ status: "success" });
   }
 });
+app.get("/refdisease", async (req, res) => {
+  //res.status(200).json({ status: "OK" });
+  const refdisease = await refdisease.findAll();
+  res.status(200).json({ status: "OK",data: ref_disease });
+  //console.log(ref_disease");
+});
 app.post("/check-user-moph-ic-v2", async (req, res) => {
-  const { hospcode, password, username, idTokenLine, LineType, LineTypeDesc } =
+  const { hospcode, password, username, idTokenLine, LineType, LineTypeDesc, refdisease } =
     req.body;
   if (!username || !hospcode || !password || !idTokenLine || !LineType) {
     return res
@@ -175,6 +180,7 @@ app.post("/check-user-moph-ic-v2", async (req, res) => {
             user_id_line: userId,
             line_type: LineType,
             line_description: LineTypeDesc,
+            id_disease: refdisease,
             created_at: new Date(),
             status: "active",
           });
