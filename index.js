@@ -4,7 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const sequelize = require("sequelize");
 //const Usersso = require("./models/usersso");
-const { User, refdisease } = require("./models/user");
+const { User, Refdisease } = require("./models/user");
 const Events = require("./models/event");
 const { sendEmail } = require("./emailSender");
 const e = require("express");
@@ -33,72 +33,6 @@ app.get("/", async (req, res) => {
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK" });
 });
-
-// app.post("/check-user-moph-ic-v1", async (req, res) => {
-//   //req.setHeader("Access-Control-Allow-Origin", "*");
-//   const { hospcode, password, username, idTokenLine } = req.body;
-//   if (!username) {
-//     return res.status(404).json({ error: "username is required" });
-//   }
-//   //check user on PDSA
-//   const user_pdsa = await Usersso.findByUserPDSA(username);
-//   if (user_pdsa) {
-//     // Create HMAC-SHA256 hash
-//     const hmac = crypto.createHmac("sha256", process.env.MOPHIC_SECRETKEY);
-//     hmac.update(password);
-//     const hash = hmac.digest("hex");
-//     const password_encrypt = hash.toUpperCase();
-//     // Option 1: Append parameters to the URL
-//     const urlWithParameters = `${process.env.MOPHIC_ENDPOINT_AUTH}&user=${username}&password_hash=${password_encrypt}&hospital_code=${hospcode}`;
-//     axios
-//       .post(urlWithParameters)
-//       .then((response) => {
-//         // Decode the JWT payload
-//         const decodedPayload = jwt.decode(response.data, { complete: true });
-//         res.status(200).json({ data: decodedPayload });
-//       })
-//       .catch((error) => {
-//         console.error(error);
-//       });
-//   } else {
-//     res.status(400).json({ error: `user : ${username} not found` });
-//   }
-// });
-
-// app.get("/events-response", async (req, res) => {
-//   const { EventID, NotifyID, idTokenLine, ActionID } = req.body;
-//   if (!EventID || !NotifyID || !idTokenLine || !ActionID) {
-//     return res
-//       .status(404)
-//       .json({ error: "EventID,NotifyID,idTokenLine is required" });
-//   } else {
-//     console.log(`idTokenLine : ${idTokenLine}`);
-//     const profile_decode = await line.verifyIDToken(idTokenLine);
-//     // Get userId Profile
-//     const userId = profile_decode?.sub;
-//     try {
-//       const user = await User.findOne({ where: { user_id_line: userId } });
-//       if (user) {
-//         Events.create({
-//           user_id_line: userId,
-//           hospcode: user.hospcode,
-//           username: user.username,
-//           event_id: EventID,
-//           notify_id: NotifyID,
-//           action_id: ActionID,
-//           created_at: new Date(),
-//         });
-//       } else {
-//         console.log("User not found");
-//         return res
-//           .status(404)
-//           .json({ error: "ไม่พบผู้ใช้งานจากการค้นหาด้วย userId" });
-//       }
-//     } catch (error) {
-//       console.error(`Error Find By userId: ${idTokenLine}`, error);
-//     }
-//   }
-// });
 app.post("/events-response", async (req, res) => {
   const { EventID, NotifyID, idTokenLine, ActionID } = req.body;
   console.log(`EventID : ${EventID} ,NotifyID : ${NotifyID} ,idTokenLine : ${idTokenLine} ,ActionID : ${ActionID}`);
@@ -138,12 +72,12 @@ app.post("/events-response", async (req, res) => {
 });
 app.get("/refdisease", async (req, res) => {
   //res.status(200).json({ status: "OK" });
-  const refdisease = await refdisease.findAll();
+  const ref_disease = await Refdisease.findAll();
   res.status(200).json({ status: "OK",data: ref_disease });
-  //console.log(ref_disease");
+  console.log("ref_disease");
 });
 app.post("/check-user-moph-ic-v2", async (req, res) => {
-  const { hospcode, password, username, idTokenLine, LineType, LineTypeDesc, refdisease } =
+  const { hospcode, password, username, idTokenLine, LineType, LineTypeDesc } =
     req.body;
   if (!username || !hospcode || !password || !idTokenLine || !LineType) {
     return res

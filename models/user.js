@@ -2,10 +2,10 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../sequelize");
 //ฟังก์ชั่นเรียกโรค
-const refdisease = sequelize.define(
-  "refdisease",
+const Refdisease = sequelize.define(
+  "Refdisease",
   {
-    disease_name: {
+    id_disease: {
       type: DataTypes.STRING,
     },
   },
@@ -51,8 +51,8 @@ const User = sequelize.define(
       defaultValue: null,
       comment: "ชื่อกลุ่มงาน/หน่วยงาน",
     },
-    disease_name: {
-      type: DataTypdes.STRING(255),
+    id_disease: {
+      type: DataTypes.STRING,
       allowNull: true,
       defaultValue: null,
       comment: "โรคที่รับผิดชอบ",
@@ -74,4 +74,4 @@ const User = sequelize.define(
 // User.sync({ force: false }).then(() => {
 //   console.log("User table synced");
 // });
-module.exports = User,refdisease;
+module.exports = [User,Refdisease];
