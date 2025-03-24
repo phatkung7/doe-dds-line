@@ -5,14 +5,36 @@ const sequelize = require("../sequelize");
 const Refdisease = sequelize.define(
   "Refdisease",
   {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     id_disease: {
+      type: DataTypes.STRING(4),
+      allowNull: false,
+      comment: "รหัสโรค",
+    },
+    disease_name: {
       type: DataTypes.STRING,
+    },
+    full_disease_th: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    disease_th: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    disease_gr: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      comment: "กลุ่มโรค",
     },
   },
   {
-    tableName: "ref_disease", // You can customize the table name if needed
-    timestamps: false,
-    //timestamps: true, // Set to true if you want createdAt and updatedAt fields
+    tableName: "ref_disease", // ระบุชื่อตารางให้ตรงกับฐานข้อมูล
+    timestamps: false, // ปิดการใช้ createdAt / updatedAt
   }
 );
 const User = sequelize.define(
@@ -74,4 +96,4 @@ const User = sequelize.define(
 // User.sync({ force: false }).then(() => {
 //   console.log("User table synced");
 // });
-module.exports = [User,Refdisease];
+module.exports = { User, Refdisease };

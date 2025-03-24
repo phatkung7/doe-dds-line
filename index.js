@@ -70,11 +70,11 @@ app.post("/events-response", async (req, res) => {
     res.status(200).json({ status: "success" });
   }
 });
-app.get("/refdisease", async (req, res) => {
-  //res.status(200).json({ status: "OK" });
+app.get("/ref_disease", async (req, res) => {
+  // res.status(200).json({ status: "OK" });
   const ref_disease = await Refdisease.findAll();
   res.status(200).json({ status: "OK",data: ref_disease });
-  console.log("ref_disease");
+  console.log(ref_disease);
 });
 app.post("/check-user-moph-ic-v2", async (req, res) => {
   const { hospcode, password, username, idTokenLine, LineType, LineTypeDesc } =
@@ -141,7 +141,7 @@ app.get("/ref-position", async (req, res) => {
   //res.status(200).json({ status: "OK" });
   const ref_position = await RefPosition.findAll();
   res.status(200).json({ status: "OK",data: ref_position });
-  //console.log(ref_position);
+  console.log(ref_position);
 });
 //ref section
 app.get("/ref-section", async (req, res) => {
