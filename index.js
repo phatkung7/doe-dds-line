@@ -77,12 +77,13 @@ app.get("/ref_disease", async (req, res) => {
   console.log(ref_disease);
 });
 app.post("/check-user-moph-ic-v2", async (req, res) => {
+  console.log("Request Body:", req.body);
   const { hospcode, password, username, idTokenLine, LineType, LineTypeDesc } =
     req.body;
-  if (!username || !hospcode || !password || !idTokenLine || !LineType) {
+  if (!username || !hospcode || !password || !idTokenLine || !LineType || !diseases) {
     return res
       .status(404)
-      .json({ error: "username,hospcode,idTokenLine,LineType is required" });
+      .json({ error: "กรุณากรอกข้อมูลให้ครบถ้วน ประกอบด้วย hospcode,username,password,โรคที่ท่านต้องการแจ้งเตือน" });
   }
   console.log(`idTokenLine : ${idTokenLine}`);
   //Line Decode Token
