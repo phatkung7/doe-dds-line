@@ -143,7 +143,7 @@ app.get("/ref-position", async (req, res) => {
   //res.status(200).json({ status: "OK" });
   const ref_position = await RefPosition.findAll();
   res.status(200).json({ status: "OK",data: ref_position });
-  console.log(ref_position);
+  // console.log(ref_position);
 });
 //ref section
 app.get("/ref-section", async (req, res) => {
@@ -157,7 +157,7 @@ app.get("/ref-section", async (req, res) => {
 app.post("/doe-sarabun-register", async (req, res) => {
   const {  idTokenLine, email, title_name, first_name, last_name, password, position_id, section_id, tel } = req.body;
   // แสดงข้อมูลที่ถูกส่งมา (request body)
-  console.log("Request Body:", req.body);
+  // console.log("Request Body:", req.body);
 
   if ( !idTokenLine ) {
     return res
@@ -171,7 +171,7 @@ app.post("/doe-sarabun-register", async (req, res) => {
       try {
         const user = await Users.findOne({ where: { email: email } });
         if (user) {
-          console.log("ไปอัพเดทนะพ่อหนุ่ม");
+          // console.log("ไปอัพเดทนะพ่อหนุ่ม");
           try {
             // ค้นหา user จากตาราง Users โดยใช้ email
             const user_id = await Users.findOne({ where: { email: email } });
@@ -191,7 +191,7 @@ app.post("/doe-sarabun-register", async (req, res) => {
                 },
               }
             );
-            console.log("อัปเดตข้อมูลสำเร็จ");
+            // console.log("อัปเดตข้อมูลสำเร็จ");
             // ส่งข้อมูลกลับ
             res.status(200).json({ status: "success" })
             } catch (error) {
@@ -199,7 +199,7 @@ app.post("/doe-sarabun-register", async (req, res) => {
               return res.status(500).json({ error: "เกิดข้อผิดพลาดในการอัปเดตข้อมูล", message: error.message }); // ส่ง error message กลับไปด้วย
             }
         } else {
-          console.log("มาเพิ่มใหม่นะพ่อหนุ่ม");
+          // console.log("มาเพิ่มใหม่นะพ่อหนุ่ม");
           try {
             // เพิ่มข้อมูลใหม่ลงในตาราง Users
             const newUser = await Users.create({
@@ -241,7 +241,7 @@ app.post("/doe-sarabun-register", async (req, res) => {
               model_id: newUser.id,      
             },
             { raw: true });
-            console.log("อัปเดตข้อมูลสำเร็จ");
+            // console.log("อัปเดตข้อมูลสำเร็จ");
             // ส่งข้อมูลกลับ
             res.status(200).json({ status: "success" })
             } catch (error) {
