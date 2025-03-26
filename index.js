@@ -74,12 +74,13 @@ app.get("/ref_disease", async (req, res) => {
   // res.status(200).json({ status: "OK" });
   const ref_disease = await Refdisease.findAll();
   res.status(200).json({ status: "OK",data: ref_disease });
-  console.log(ref_disease);
+  // console.log(ref_disease);
 });
 app.post("/check-user-moph-ic-v2", async (req, res) => {
-  console.log("Request Body:", req.body);
-  const { hospcode, password, username, idTokenLine, LineType, LineTypeDesc } =
+  // console.log("Request Body:", req.body);
+  const { hospcode, password, username, idTokenLine, LineType, LineTypeDesc , diseases} =
     req.body;
+  // console.log(username, hospcode, password, idTokenLine, LineType,diseases);
   if (!username || !hospcode || !password || !idTokenLine || !LineType || !diseases) {
     return res
       .status(404)
@@ -115,7 +116,7 @@ app.post("/check-user-moph-ic-v2", async (req, res) => {
             user_id_line: userId,
             line_type: LineType,
             line_description: LineTypeDesc,
-            id_disease: refdisease,
+            id_disease: diseases,
             created_at: new Date(),
             status: "active",
           });

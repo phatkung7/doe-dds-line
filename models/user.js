@@ -11,7 +11,7 @@ const Refdisease = sequelize.define(
       autoIncrement: true,
     },
     id_disease: {
-      type: DataTypes.STRING(4),
+      type: DataTypes.STRING(200),
       allowNull: false,
       comment: "รหัสโรค",
     },
