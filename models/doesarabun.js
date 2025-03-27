@@ -145,8 +145,45 @@ const ModelHasSection = sequelize.define(
     //timestamps: true, // Set to true if you want createdAt and updatedAt fields
   }
 );
+
+//ฟังก์ชั่นเรียกโรค
+const Refdisease = sequelize.define(
+  "Refdisease",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    id_disease: {
+      type: DataTypes.STRING(200),
+      allowNull: false,
+      comment: "รหัสโรค",
+    },
+    disease_name: {
+      type: DataTypes.STRING,
+    },
+    full_disease_th: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    disease_th: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    disease_gr: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      comment: "กลุ่มโรค",
+    },
+  },
+  {
+    tableName: "ref_disease", // ระบุชื่อตารางให้ตรงกับฐานข้อมูล
+    timestamps: false, // ปิดการใช้ createdAt / updatedAt
+  }
+);
 //This will create the "users" table in your database
 // User.sync({ force: false }).then(() => {
 //   console.log("User table synced");
 // });
-module.exports = { RefPosition, RefSection, Users, UsersDetail, ModelHasRoles, ModelHasSection };
+module.exports = { RefPosition, RefSection, Users, UsersDetail, ModelHasRoles, ModelHasSection, Refdisease };

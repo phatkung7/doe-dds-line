@@ -4,7 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const sequelize = require("sequelize");
 //const Usersso = require("./models/usersso");
-const { User, Refdisease } = require("./models/user");
+const { User } = require("./models/user");
 const Events = require("./models/event");
 const { sendEmail } = require("./emailSender");
 const e = require("express");
@@ -14,7 +14,7 @@ const jwt = require("jsonwebtoken");
 //Line API
 const line = require("./util/line.util");
 // ref position 
-const {  RefPosition, RefSection, Users, UsersDetail, ModelHasRoles, ModelHasSection  } =  require("./models/doesarabun")
+const {  RefPosition, RefSection, Users, UsersDetail, ModelHasRoles, ModelHasSection, Refdisease  } =  require("./models/doesarabun")
 //Line Notify
 //const lineNotify = require("line-notify-nodejs")(process.env.LINE_NOTIFY);
 
@@ -70,7 +70,7 @@ app.post("/events-response", async (req, res) => {
     res.status(200).json({ status: "success" });
   }
 });
-app.get("/ref-disease", async (req, res) => {
+app.get("/ref_disease", async (req, res) => {
   // res.status(200).json({ status: "OK" });
   const ref_disease = await Refdisease.findAll();
   res.status(200).json({ status: "OK",data: ref_disease });
