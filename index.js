@@ -19,8 +19,8 @@ const {  RefPosition, RefSection, Users, UsersDetail, ModelHasRoles, ModelHasSec
 //const lineNotify = require("line-notify-nodejs")(process.env.LINE_NOTIFY);
 
 const app = express();
-const port = 3333;
-// const port = 3000;
+// const port = 3333;
+const port = process.env.PORT;
 app.use(cors());
 
 // Middleware to parse JSON
