@@ -77,10 +77,10 @@ app.get("/ref_disease", async (req, res) => {
   // console.log(ref_disease);
 });
 app.post("/check-user-moph-ic-v2", async (req, res) => {
-  // console.log("Request Body:", req.body);
+  console.log("Request Body:", req.body);
   const { hospcode, password, username, idTokenLine, LineType, LineTypeDesc , diseases} =
     req.body;
-  // console.log(username, hospcode, password, idTokenLine, LineType,diseases);
+  console.log(username, hospcode, password, idTokenLine, LineType,diseases);
   if (!username || !hospcode || !password || !idTokenLine || !LineType || !diseases) {
     return res
       .status(404)
@@ -111,7 +111,7 @@ app.post("/check-user-moph-ic-v2", async (req, res) => {
         const moph_username = decodedPayload.payload.client.login;
         if (moph_hospcode || moph_username || userId) {
           User.create({
-            hospcode: moph_hospcode,
+            hospcoded: moph_hospcode,
             username: moph_username,
             user_id_line: userId,
             line_type: LineType,
