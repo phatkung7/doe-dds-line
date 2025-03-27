@@ -70,7 +70,7 @@ app.post("/events-response", async (req, res) => {
     res.status(200).json({ status: "success" });
   }
 });
-app.get("/ref_disease", async (req, res) => {
+app.get("/ref-disease", async (req, res) => {
   // res.status(200).json({ status: "OK" });
   const ref_disease = await Refdisease.findAll();
   res.status(200).json({ status: "OK",data: ref_disease });
